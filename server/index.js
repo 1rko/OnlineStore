@@ -7,12 +7,14 @@ const cors = require('cors')
 const fileUpload = require('express-fileupload')
 const router = require('./routes/index')
 const errorHandler = require('./middleware/ErrorHandlingMiddleware')
+const path = require('path')
 
 
 const app = express()
 app.use(cors())                 //чтоб можно было слать запросы
 app.use(express.json())         //чтоб приложение могло парсить json
-app.use(fileUpload({}) )         //
+app.use(express.static( path.resolve(__dirname, 'static')))         //чтоб файлы из папки static раздавать как статику
+app.use(fileUpload({}) )         //Загружает файл в локальную директорию
 app.use('/api', router)         //привязка корневого роутера
 
 //Обработка ошибок, последний middleware
