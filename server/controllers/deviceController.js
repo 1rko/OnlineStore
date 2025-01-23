@@ -1,6 +1,6 @@
 const uuid = require('uuid')
 const path = require('path')         //модуль в node.js
-const {Device} = require('../models/models')
+const {Device, DeviceInfo} = require('../models/models')
 const ApiError = require('../errors/ApiErrors')
 
 //создается класс с методами, которые cрабатывают на соответ тип rest-запроса
@@ -41,7 +41,15 @@ class DeviceController {
     }
 
     async getOne(req, res) {
+        const {id} = req.params
+        const device = await Device.findOne(
+            {
+                where: {id},
+                include: [{model: DeviceInfo, as: 'info'}]
+            },
+        )
 
+        return res.json(device)
     }
 }
 
