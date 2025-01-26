@@ -1,7 +1,28 @@
-const apiErrors = require('../errors/ApiErrors')
+const apiError = require('../errors/ApiErrors')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const {User, Basket} = require('../models/models')
 
 class UserController {
-    async registration(req, res) {
+    async registration(req, res, next) {
+        const {email, password, role} = req.body
+        if (!email || !password) {
+            return next(apiError.badRequest("Неверный email или password"))
+        }
+        const candidate = await User.findOne({where: {email}})
+        if (candidate) {
+            return next(apiError.badRequest("Пользователь с таким email уже сущетсвует"))
+        }
+        const hashPassword = await bcrypt.hash(password, 5)
+        const user = await User.create({email, role, password: hashPassword})
+        const basket = await Basket.create( {userId: user.id})
+        const token = jwt.sign(
+            {id: user.id, email, role},
+            process.env.SECRET_KEY,
+            {expiresIn: '24h'}
+        )
+        return res.json({token})
+        //return res.json({email, password})
 
     }
 
@@ -11,10 +32,11 @@ class UserController {
 
     async check(req, res, next) {
         const {id} = req.query
-        if(!id) {
-            return next(apiErrors.badRequest('Не задан id' ))
+        if (!id) {
+            return next(apiError.badRequest('Не задан id'))
         }
-        res.json(id)    }
+        res.json(id)
+    }
 }
 
 module.exports = new UserController()
