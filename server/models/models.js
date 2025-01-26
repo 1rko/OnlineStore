@@ -71,7 +71,7 @@ Rating.belongsTo(Device)
 Device.hasMany(BasketDevice)
 BasketDevice.belongsTo(Device)
 
-Device.hasMany(DeviceInfo, { as: 'info' })
+Device.hasMany(DeviceInfo, { as: 'info' })  //чтобы отображать таблицу под именем 'info'
 DeviceInfo.belongsTo(Device)
 
 Type.belongsToMany(Brand, {through: TypeBrand})
