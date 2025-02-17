@@ -3,8 +3,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User, Basket} = require('../models/models')
 
-const generateJwt = (id, email, role) =>{
-   return jwt.sign(
+const generateJwt = (id, email, role) => {
+    return jwt.sign(
         {id, email, role},
         process.env.SECRET_KEY,
         {expiresIn: '24h'}
@@ -34,20 +34,17 @@ class UserController {
         if (!user) {
             return next(apiError.badRequest("Пользователь с таким email не сущетсвует"))
         }
-        let comparePassword = bcrypt.compareSync(password, user.password)
+        let comparePassword = bcrypt.compareSync(password, user.password)   //это синхронная функция
         if (!comparePassword) {
-            return next(apiError.badRequest('Неверный пароль' ))
+            return next(apiError.badRequest('Неверный пароль'))
         }
         const token = generateJwt(user.id, user.email, user.role)
         return res.json({token})
     }
 
     async check(req, res, next) {
-        const {id} = req.query
-        if (!id) {
-            return next(apiError.badRequest('Не задан id'))
-        }
-        res.json(id)
+
+        res.json({message:"All right"})
     }
 }
 
